@@ -32,5 +32,5 @@ app.get('/getAccessToken', (req, res) => {
 });
 
 app.listen(config.port, () => {
-	console.log(`wwechat serer started port ${config.port}`)
+	console.log(`wechat server started port:${config.port}`)
 });

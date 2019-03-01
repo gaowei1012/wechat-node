@@ -1,5 +1,6 @@
 const config = {
 	port: 7090,
+	// host: document.location.hostname,
 	// wechat token
 	token: "wechat",
 	appId: "wx59d4028376922737",
