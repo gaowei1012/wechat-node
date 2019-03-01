@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const https = require('https');
 const util = require('util');
 const fs = require('fs');
+const parseString = require('xml2js');
 const accessTokenJson = require('./access-token');
 
 // wechat 构造函数
@@ -108,7 +109,7 @@ WeChat.prototype.getAccessToken = function () {
                 let result = JSON.parse(data);
                 if (data.indexOf('errcode') < 0) {
                     accessTokenJson.access_token = result.access_token;
-                    accessTokenJson.expires_time = new Date().getTime() + (parseInt(result.expires_in) -200) * 1000;
+                    accessTokenJson.expires_time = new Date().getTime() + (parseInt(result.expires_in) - 200) * 1000;
                     // 保存
                     fs.writeFile('./wechat/access_token.json', JSON.stringify(accessTokenJson));
 
@@ -124,5 +125,71 @@ WeChat.prototype.getAccessToken = function () {
     });
 };
 
+
+// 处理温馨消息
+WeChat.prototype.handMsg = function (req, res) {
+    let buffer = [];
+
+    req.on('data', (data) => {
+        buffer.push(data);
+    });
+
+    req.on('end', () => {
+        let msgXml = Buffer.concat(buffer).toString('utf-8');
+        parseString(msgXml, { explicitArray: false }, (err, result) => {
+            if (!err) {
+                result = result.xml;
+                let toUser = result.ToUserName; // 接收微信
+                let fromUser = result.FromUserName; // 发送微信
+
+                // 消息类型
+                if (result.MsgType.toLowerCase() === 'event') {
+                    // 返回消息
+                    switch (result.Event.toLowerCase()) {
+                        case 'subscribe':
+                            let conetnt = "欢迎关注执念的微信公众号";
+                                conetnt += "1.你是谁\n";
+                                conetnt += "2.业务介绍\n";
+                                conetnt += "3.回复留言\n";
+                                conetnt += "4.微信小程序定制开发\n";
+                                conetnt += "5.网站定制开发\n";
+                                conetnt += "因为专注，所以专业";
+                            res.end(msg.txtMsg(fromUser, toUser), conetnt);
+                            break;
+                        case 'click':
+                            let contentArr = [
+                                { Title: "Node.js 微信自定义菜单", Description: "使用Node.js实现自定义微信菜单", PicUrl: "http://img.blog.csdn.net/20170605162832842?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaHZrQ29kZXI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast", Url: "http://blog.csdn.net/hvkcoder/article/details/72868520" },
+                                { Title: "Node.js access_token的获取、存储及更新", Description: "Node.js access_token的获取、存储及更新", PicUrl: "http://img.blog.csdn.net/20170528151333883?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaHZrQ29kZXI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast", Url: "http://blog.csdn.net/hvkcoder/article/details/72783631" },
+                                { Title: "Node.js 接入微信公众平台开发", Description: "Node.js 接入微信公众平台开发", PicUrl: "http://img.blog.csdn.net/20170605162832842?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaHZrQ29kZXI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast", Url: "http://blog.csdn.net/hvkcoder/article/details/72765279" }
+                            ];
+                            reportMsg = msg.graphicMsg(fromUser, toUser, contentArr);
+                            break;
+                    };
+                } else {
+                    // 文本
+                    if (result.MsgType.toLowerCase() === 'text') {
+                        switch(result.Conetnt) {
+                            case 1:
+                                res.send(msg.txtMsg(fromUser,toUser,'Hello \r\n'));
+                                break;
+                            case 2:
+                                res.send(msg.txtMsg(fromUser, toUser, '业务开通中 \r\n'));
+                                break;
+                            case 3:
+                                res.send(msg.txtMsg(fromUser, toUser, '回复留言,我会看到的哦😯!!!'))
+                                break;
+                            default:
+                                res.send(msg.txtMsg(fromUser, toUser, '没有这个选项喲!~'));
+                                break;
+                        }
+                    }
+                }
+
+            } else {
+                console.log(err);
+            }
+        });
+    })
+};
 
 module.exports = WeChat;

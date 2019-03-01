@@ -7,7 +7,21 @@ let wechatApp = new WeChat(config);
 
 app.get('/', (req, res) => {
 	wechatApp.auth(req, res);
-	
+});
+
+// 处理消息
+app.post('/', (req, res) => {
+	let buffer = [];
+
+	// data
+	req.on('data', (data) => {
+		buffer.push(data)
+	});
+
+	// end 
+	req.on('end', () => {
+		console.log(Buffer.concat(buffer).toString('utf-8'))
+	});
 });
 
 // 请求获取 accesss_token
