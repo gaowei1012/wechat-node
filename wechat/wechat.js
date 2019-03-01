@@ -72,7 +72,7 @@ let WeChat = function (config) {
 // auth
 WeChat.prototype.auth = function (req, res) {
     // 获取微信服务器Get请求呃参数，signature，timestamp， nonce， echostr
-    let signature = req.qurey.sinature, // 微信加密签名
+    let signature = req.qurey.signature, // 微信加密签名
         timestamp = req.query.timestamp, // 时间戳
         nonce = req.query.nonce, // 数据数
         echostr = req.query.echostr; // 数据字符串
