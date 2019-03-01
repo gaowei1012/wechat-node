@@ -1,5 +1,5 @@
 const config = {
-	port: 8090,
+	port: 7090,
 	// wechat token
 	token: "wechat",
 	appId: "wx59d4028376922737",
