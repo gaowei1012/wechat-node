@@ -148,12 +148,12 @@ WeChat.prototype.handMsg = function (req, res) {
                     switch (result.Event.toLowerCase()) {
                         case 'subscribe':
                             let conetnt = "欢迎关注执念的微信公众号";
-                                conetnt += "1.你是谁\n";
-                                conetnt += "2.业务介绍\n";
-                                conetnt += "3.回复留言\n";
-                                conetnt += "4.微信小程序定制开发\n";
-                                conetnt += "5.网站定制开发\n";
-                                conetnt += "因为专注，所以专业";
+                            conetnt += "1.你是谁\n";
+                            conetnt += "2.业务介绍\n";
+                            conetnt += "3.回复留言\n";
+                            conetnt += "4.微信小程序定制开发\n";
+                            conetnt += "5.网站定制开发\n";
+                            conetnt += "因为专注，所以专业";
                             res.end(msg.txtMsg(fromUser, toUser), conetnt);
                             break;
                         case 'click':
@@ -168,9 +168,9 @@ WeChat.prototype.handMsg = function (req, res) {
                 } else {
                     // 文本
                     if (result.MsgType.toLowerCase() === 'text') {
-                        switch(result.Conetnt) {
+                        switch (result.Conetnt) {
                             case 1:
-                                res.send(msg.txtMsg(fromUser,toUser,'Hello \r\n'));
+                                res.send(msg.txtMsg(fromUser, toUser, 'Hello \r\n'));
                                 break;
                             case 2:
                                 res.send(msg.txtMsg(fromUser, toUser, '业务开通中 \r\n'));
